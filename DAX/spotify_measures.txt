@@ -1,0 +1,184 @@
+DEFINE
+MEASURE 'spotify-top-50-world'[Total Rows] =
+    COUNTROWS('spotify-top-50-world')
+
+MEASURE 'spotify-top-50-world'[Total Songs] =
+    DISTINCTCOUNT('spotify-top-50-world'[song])
+
+MEASURE 'spotify-top-50-world'[Total Artists] =
+    DISTINCTCOUNT('spotify-top-50-world'[artist])
+
+MEASURE 'spotify-top-50-world'[Avg Popularity] =
+    AVERAGE('spotify-top-50-world'[popularity])
+
+MEASURE 'spotify-top-50-world'[Median Popularity] =
+    MEDIAN('spotify-top-50-world'[popularity])
+
+MEASURE 'spotify-top-50-world'[Max Popularity] =
+    MAX('spotify-top-50-world'[popularity])
+
+MEASURE 'spotify-top-50-world'[Min Popularity] =
+    MIN('spotify-top-50-world'[popularity])
+
+MEASURE 'spotify-top-50-world'[Avg Position] =
+    AVERAGE('spotify-top-50-world'[position])
+
+MEASURE 'spotify-top-50-world'[Median Position] =
+    MEDIAN('spotify-top-50-world'[position])
+
+MEASURE 'spotify-top-50-world'[Peak Position] =
+    MIN('spotify-top-50-world'[position])
+
+MEASURE 'spotify-top-50-world'[Count Top 10] =
+    CALCULATE(
+        COUNTROWS('spotify-top-50-world'),
+        FILTER('spotify-top-50-world', 'spotify-top-50-world'[position] <= 10)
+    )
+
+MEASURE 'spotify-top-50-world'[% Top 10] =
+    DIVIDE([Count Top 10], [Total Rows], 0)
+
+MEASURE 'spotify-top-50-world'[Avg Duration (ms)] =
+    AVERAGE('spotify-top-50-world'[duration_ms])
+
+MEASURE 'spotify-top-50-world'[Avg Duration (minutes)] =
+    DIVIDE(AVERAGE('spotify-top-50-world'[duration_ms]), 60000)
+
+MEASURE 'spotify-top-50-world'[Median Duration (ms)] =
+    MEDIAN('spotify-top-50-world'[duration_ms])
+
+MEASURE 'spotify-top-50-world'[Count Explicit] =
+    CALCULATE(
+        COUNTROWS('spotify-top-50-world'),
+        FILTER('spotify-top-50-world', 'spotify-top-50-world'[is_explicit] = TRUE())
+    )
+
+MEASURE 'spotify-top-50-world'[% Explicit] =
+    DIVIDE([Count Explicit], [Total Rows], 0)
+
+MEASURE 'spotify-top-50-world'[Avg Popularity (Explicit)] =
+    CALCULATE(
+        AVERAGE('spotify-top-50-world'[popularity]),
+        FILTER('spotify-top-50-world', 'spotify-top-50-world'[is_explicit] = TRUE())
+    )
+
+MEASURE 'spotify-top-50-world'[Avg Popularity (Non-Explicit)] =
+    CALCULATE(
+        AVERAGE('spotify-top-50-world'[popularity]),
+        FILTER('spotify-top-50-world', 'spotify-top-50-world'[is_explicit] = FALSE())
+    )
+
+MEASURE 'spotify-top-50-world'[Avg Total Tracks per Album] =
+    AVERAGE('spotify-top-50-world'[total_tracks])
+
+MEASURE 'spotify-top-50-world'[Distinct Release Years] =
+    COUNTROWS(
+        DISTINCT(
+            SELECTCOLUMNS(
+                'spotify-top-50-world',
+                "Year", YEAR('spotify-top-50-world'[release_date])
+            )
+        )
+    )
+
+MEASURE 'spotify-top-50-world'[Avg Popularity by Release Year] =
+    AVERAGEX(
+        DISTINCT(
+            SELECTCOLUMNS(
+                'spotify-top-50-world',
+                "Year", YEAR('spotify-top-50-world'[release_date])
+            )
+        ),
+        CALCULATE(
+            AVERAGE('spotify-top-50-world'[popularity]),
+            FILTER(
+                'spotify-top-50-world',
+                YEAR('spotify-top-50-world'[release_date]) = [Year]
+            )
+        )
+    )
+
+MEASURE 'spotify-top-50-world'[Days On Chart Per Song (Avg)] =
+    AVERAGEX(
+        VALUES('spotify-top-50-world'[song]),
+        CALCULATE(DISTINCTCOUNT('spotify-top-50-world'[date]))
+    )
+
+MEASURE 'spotify-top-50-world'[Max Days On Chart (Any Song)] =
+    MAXX(
+        ADDCOLUMNS(
+            VALUES('spotify-top-50-world'[song]),
+            "Days", CALCULATE(DISTINCTCOUNT('spotify-top-50-world'[date]))
+        ),
+        [Days]
+    )
+
+MEASURE 'spotify-top-50-world'[Song With Most Days On Chart] =
+    VAR tbl =
+        ADDCOLUMNS(
+            VALUES('spotify-top-50-world'[song]),
+            "Days", CALCULATE(DISTINCTCOUNT('spotify-top-50-world'[date]))
+        )
+    VAR topSongTbl = TOPN(1, tbl, [Days], DESC)
+    RETURN
+        CONCATENATEX(topSongTbl, 'spotify-top-50-world'[song], ", ")
+
+MEASURE 'spotify-top-50-world'[Song Occurrences] =
+    COUNTROWS('spotify-top-50-world')
+
+MEASURE 'spotify-top-50-world'[Avg Popularity Weighted By Position] =
+    DIVIDE(
+        SUMX(
+            'spotify-top-50-world',
+            'spotify-top-50-world'[popularity] * (1 / 'spotify-top-50-world'[position])
+        ),
+        SUMX('spotify-top-50-world', (1 / 'spotify-top-50-world'[position])),
+        BLANK()
+    )
+
+MEASURE 'spotify-top-50-world'[Top Artist By Song Count] =
+    VAR tblArtist =
+        ADDCOLUMNS(
+            VALUES('spotify-top-50-world'[artist]),
+            "SongCount", CALCULATE(DISTINCTCOUNT('spotify-top-50-world'[song]))
+        )
+    VAR topArtistTbl = TOPN(1, tblArtist, [SongCount], DESC)
+    RETURN
+        CONCATENATEX(topArtistTbl, 'spotify-top-50-world'[artist], ", ")
+
+MEASURE 'spotify-top-50-world'[Newest Release Date] =
+    MAX('spotify-top-50-world'[release_date])
+
+MEASURE 'spotify-top-50-world'[Oldest Release Date] =
+    MIN('spotify-top-50-world'[release_date])
+
+EVALUATE
+SUMMARIZECOLUMNS(
+    'spotify-top-50-world'[song],
+    "Artist", SELECTEDVALUE('spotify-top-50-world'[artist]),
+    "Occurrences", [Song Occurrences],
+    "Avg Popularity", [Avg Popularity],
+    "Median Popularity", [Median Popularity],
+    "Max Popularity", [Max Popularity],
+    "Avg Position", [Avg Position],
+    "Peak Position", [Peak Position],
+    "Count Top 10", [Count Top 10],
+    "% Top 10", [% Top 10],
+    "Avg Duration (ms)", [Avg Duration (ms)],
+    "Avg Duration (minutes)", [Avg Duration (minutes)],
+    "Median Duration (ms)", [Median Duration (ms)],
+    "Days On Chart (Avg)", [Days On Chart Per Song (Avg)],
+    "Max Days On Chart", [Max Days On Chart (Any Song)],
+    "Song With Most Days", [Song With Most Days On Chart],
+    "Explicit Count", [Count Explicit],
+    "% Explicit", [% Explicit],
+    "Avg Popularity Weighted By Position", [Avg Popularity Weighted By Position],
+    "Top Artist By Song Count", [Top Artist By Song Count],
+    "Distinct Release Years", [Distinct Release Years],
+    "Avg Popularity by Release Year", [Avg Popularity by Release Year],
+    "Newest Release Date", [Newest Release Date],
+    "Oldest Release Date", [Oldest Release Date],
+    "Total Songs", [Total Songs],
+    "Total Artists", [Total Artists],
+    "Total Rows", [Total Rows]
+)
