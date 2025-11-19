@@ -54,7 +54,10 @@ The dashboard was built using Power BI Desktop and published using Power BI Serv
 ---
 
 ## 📸 Dashboard Preview
-https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201128.png
+![Dashboard Preview](https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201128.png)
+![Dashboard Preview](https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201241.png)
+![Dashboard Preview](https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201347.png)
+![Dashboard Preview](https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201527.png)
 ---
 
 ## 🗂️ Dataset
@@ -70,21 +73,21 @@ The dataset used for this project contains Spotify music data with the following
 | `is_explicit` | Explicit content indicator |
 | `position` | Song’s position on the chart |
 
-📂 Dataset file: [`Data/spotify-top-50-world.csv`](Data/spotify-top-50-world.csv)
+📂 Dataset file: [`Data/spotify-top-50-world.csv`](Data/spotify-top-50-world (1).csv)
 
 ---
 
 ## ⚙️ DAX Measures
 All key calculations (like averages, explicit song count, and popularity KPIs) are written in DAX.
 
-📄 DAX file: [`Dax/spotify_measures.dax`](Dax/spotify_measures.dax)
+📄 DAX file: [`Dax/spotify_measures.dax`](DAX/spotify_measures.txt)
 
 ---
 
 ## 💡 Power BI File
 You can explore and interact with the dashboard using the Power BI file below.
 
-📊 Power BI file: [`PowerBI/Spotify Dashboard.pbix`](PowerBI/Spotify%20Dashboard.pbix)
+📊 Power BI file: [`PowerBI/Spotify Dashboard.pbix`](PowerBI/spotify_project.pbix)
 
 ---
 
