@@ -54,7 +54,7 @@ The dashboard was built using Power BI Desktop and published using Power BI Serv
 ---
 
 ## 📸 Dashboard Preview
-
+https://github.com/KantamoniManoj/Spotify_DataAnalysis_Dashboard_Project/blob/main/images/images/Screenshot%202025-11-19%20201128.png
 ---
 
 ## 🗂️ Dataset
